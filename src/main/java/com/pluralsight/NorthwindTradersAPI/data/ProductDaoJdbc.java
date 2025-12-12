@@ -1,12 +1,15 @@
 package com.pluralsight.NorthwindTradersAPI.data;
 
 import com.pluralsight.NorthwindTradersAPI.model.Product;
+import org.springframework.stereotype.Component;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductDaoJdbc {
+@Component
+public class ProductDaoJdbc implements ProductDao {
     private DataSource dataSource;
 
     public ProductDaoJdbc(DataSource dataSource) {
@@ -47,7 +50,7 @@ public class ProductDaoJdbc {
         return products;
     }
 
-    public Product find(int id) {
+    public Product getById(int id) {
         Product product = null;
         String query = "SELECT * FROM products WHERE ProductID = ?";
 
@@ -82,7 +85,7 @@ public class ProductDaoJdbc {
     }
 
     // create
-    public Product add(Product product) {
+    public Product insert(Product product) {
         String query = """
         INSERT INTO products
             (ProductName, SupplierID, CategoryID, QuantityPerUnit,
@@ -120,7 +123,7 @@ public class ProductDaoJdbc {
         return product;
     }
 
-    public Product update(Product product) {
+    public void update(int productId,Product product) {
         String query = """
         UPDATE products
         SET ProductName = ?,
@@ -147,15 +150,13 @@ public class ProductDaoJdbc {
             preparedStatement.setShort(7, product.getUnitsOnOrder());
             preparedStatement.setShort(8, product.getReorderLevel());
             preparedStatement.setBoolean(9, product.getDiscontinued());
-            preparedStatement.setInt(10, product.getProductId()); // WHERE clause
+            preparedStatement.setInt(10, productId); // WHERE clause
 
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return product;
     }
 
     // delete
